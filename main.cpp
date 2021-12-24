@@ -10,6 +10,7 @@ struct Treenode {
 
 Treenode *Tree;
 bool IsEmpty = true;
+bool IsFound;
 
 void console();
 
@@ -20,7 +21,7 @@ void Printing_infix(Treenode *t_ptr);
 void Printing_prefix(Treenode *t_ptr);
 void Printing_postfix(Treenode *t_ptr);
 
-void Search(int value, Treenode *t_ptr);
+Treenode *search(Treenode *root, int key);
 
 int main() {
     console();
@@ -32,7 +33,7 @@ void console() {
         cout << "Select one of the programs and enter it's number:" << endl;
         cout << "0 - Terminate the program." << endl;
         cout << "1 - Adding a node." << endl;
-        cout << "2 - Adding a node." << endl;
+        cout << "2 - Deleting a node." << endl;
         cout << "3 - Node search." << endl;
         cout << "4a - Printing a binary tree. Infix version " << endl;
         cout << "4b - Printing a binary tree. Prefix version" << endl;
@@ -72,7 +73,13 @@ void console() {
             cout << "Input the value of the node." << endl;
             cout << ">>  ";
             cin >> element;
-            Search(element, Tree);
+            IsFound = false;
+            int search_array[100];
+            search(Tree, element);
+            if (IsFound == false) {
+                cout << " " << endl;
+                cout << "There was no such element in the tree." << endl;
+            }
             cout << " " << endl;
         }
 
@@ -104,10 +111,10 @@ struct Treenode * CreateNode(int value, Treenode *t_ptr) {
         t_ptr->left =  nullptr;
         t_ptr->right = nullptr;
     }else {
-        if (value <= t_ptr->value) {
+        if (value < t_ptr->value) {
             t_ptr->left = CreateNode(value, t_ptr->left);
         }
-        else {
+        if (value > t_ptr->value) {
             t_ptr->right = CreateNode(value, t_ptr->right);
         }
     }
@@ -125,6 +132,9 @@ void DeleteNode(int value,Treenode *parent_ptr, Treenode *t_ptr, bool IsRight) {
         }
         if (value == t_ptr->value) {
             if ((t_ptr->left == nullptr) && (t_ptr->right == nullptr)){
+                if (t_ptr == Tree) {
+                    Tree = nullptr;
+                }
                 if (IsRight) {
                     parent_ptr->right = nullptr;
                 }
@@ -133,6 +143,9 @@ void DeleteNode(int value,Treenode *parent_ptr, Treenode *t_ptr, bool IsRight) {
                 }
             }
             if ((t_ptr->left != nullptr) && (t_ptr->right == nullptr)){
+                if (t_ptr == Tree) {
+                    Tree = t_ptr->left;
+                }
                 if (IsRight) {
                     parent_ptr->right = t_ptr->left;
                 }
@@ -141,6 +154,9 @@ void DeleteNode(int value,Treenode *parent_ptr, Treenode *t_ptr, bool IsRight) {
                 }
             }
             if ((t_ptr->left == nullptr) && (t_ptr->right != nullptr)){
+                if (t_ptr == Tree) {
+                    Tree = t_ptr->right;
+                }
                 if (IsRight) {
                     parent_ptr->right = t_ptr->right;
                 }
@@ -192,40 +208,19 @@ void Printing_postfix(Treenode *t_ptr) {
         cout << t_ptr->value << " -> ";
     }
 }
+Treenode *search(Treenode *root, int key) {
+    if (root == NULL) {
+        return nullptr;
+    }
+    cout << root->value << " -> ";
+    if (root->value == key) {
+        IsFound = true;
+        return root;
+    }
 
-void Search(int value, Treenode *t_ptr) {
-    if (t_ptr->value == value) {
-        cout << value << endl;
-    }
-    else {
-        cout << t_ptr -> value << " -> ";
-        if (t_ptr->value < value) {
-            if (t_ptr->right == nullptr) {
-                cout << " " << endl;
-                cout << " " << endl;
-                cout << "There is no such element in the tree." << endl;
-                return;
-            }
-            else {
-                Search(value, t_ptr->right);
-            }
-        }
-        else {
-            if (t_ptr->left == nullptr) {
-                cout << " " << endl;
-                cout << " " << endl;
-                cout << "There is no such element in the tree." << endl;
-                return;
-            }
-            else {
-                Search(value, t_ptr->left);
-            }
-        }
-    }
-    if ((t_ptr->left == nullptr) && (t_ptr->right == nullptr)){
-        cout << " " << endl;
-        cout << " " << endl;
-        cout << "There is no such element in the tree." << endl;
-        return;
+    if (key < root->value) {
+        return search(root->left, key);
+    } else {
+        return search(root->right, key);
     }
 }
